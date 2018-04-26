@@ -44,6 +44,7 @@ public class CloGameServer {
             accessor.setSessionId(sid);
             accessor.setLeaveMutable(true);
 
+            // /queue/chat - broadcasts individual messages as they arrive
             try { 
                 messagingTemplate.convertAndSendToUser(sid, "/queue/chat", payload, accessor.getMessageHeaders()); 
             }
