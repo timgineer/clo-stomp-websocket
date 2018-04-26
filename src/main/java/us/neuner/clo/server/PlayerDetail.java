@@ -6,6 +6,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import java.util.Collections;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * PlayerDetail models player-specific game state within the context of a game session.
@@ -22,24 +23,6 @@ public class PlayerDetail implements AutoCloseable {
 	static {
 		players = Collections.synchronizedSortedMap(new TreeMap<String, PlayerDetail>());
 	} 
-	
-	/**
-	 * Convert an array of bytes to a hexadecimal @see String.
-	 * @param bytes	An array of bytes.
-	 * @return A hexadecimal @see String.
-	 */
-	private static String ByteArrayToString(byte[] bytes)
-	{
-	    char[] c = new char[bytes.length * 2];
-	    int b;
-	    for (int i = 0; i < bytes.length; i++) {
-	        b = bytes[i] >> 4;
-	        c[i * 2] = (char)(55 + b + (((b-10)>>31)&-7));
-	        b = bytes[i] & 0xF;
-	        c[i * 2 + 1] = (char)(55 + b + (((b-10)>>31)&-7));
-	    }
-	    return new String(c);
-	}
 	
 	/**
 	 * Allows access to the singleton map for @see PlayerDetail instances.
@@ -61,12 +44,12 @@ public class PlayerDetail implements AutoCloseable {
 	public PlayerDetail(CloGameSession session, String sid) {
 		
 		SecureRandom rng = new SecureRandom();
-		byte[] b = new byte[16];
+		byte[] b = new byte[15];
 		rng.nextBytes(b);
 		
 		this.session = session;
 		this.sid = sid;
-		this.psid = ByteArrayToString(b);
+		this.psid = DatatypeConverter.printBase64Binary(b);
 		
 		players.put(psid, this);
 	}
