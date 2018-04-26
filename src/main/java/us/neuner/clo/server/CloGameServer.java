@@ -9,12 +9,9 @@ import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.util.HtmlUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
