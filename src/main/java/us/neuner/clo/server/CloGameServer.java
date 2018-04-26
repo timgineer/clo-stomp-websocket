@@ -67,8 +67,6 @@ public class CloGameServer {
     //client subscribes to /user/topic/chat 
     public void chatMessageHandler(ChatMessage chat, SimpMessageHeaderAccessor sha) {
 
-        ChatEntry payload = new ChatEntry(chat.getMsg());
-
         sidSet.add(sha.getSessionId());
 
         for (String sid : sidSet.toArray(new String[sidSet.size()])) {
@@ -79,7 +77,8 @@ public class CloGameServer {
 
             // /queue/chat - broadcasts individual messages as they arrive
             try { 
-                messagingTemplate.convertAndSendToUser(sid, "/queue/chat", payload, accessor.getMessageHeaders()); 
+            	ChatMessage msg = new ChatMessage("asdf", chat.getMsg());
+                messagingTemplate.convertAndSendToUser(sid, "/queue/chat", msg, accessor.getMessageHeaders()); 
             }
             catch (Exception e) {
                 //TODO: this doesn't get triggered... why not?  Probably a memory leak somewhere...
