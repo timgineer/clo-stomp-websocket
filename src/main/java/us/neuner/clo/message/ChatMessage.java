@@ -1,13 +1,11 @@
 package us.neuner.clo.message;
 
-public class ChatMessage {
+public class ChatMessage extends Message {
 
     private String msg;
 
-    public ChatMessage() {
-    }
-
-    public ChatMessage(String msg) {
+    public ChatMessage(String psid, String msg) {
+    	super(psid);
         this.msg = msg;
     }
 

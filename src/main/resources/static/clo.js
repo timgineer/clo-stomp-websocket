@@ -18,8 +18,12 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/user/queue/chat', function (greeting) {
-            showGreeting(JSON.parse(greeting.body).msg);
+        stompClient.subscribe('/user/queue/chat', function (chat) {
+            showGreeting(JSON.parse(chat.body).msg);
+        });
+        stompClient.subscribe('/user/queue/chathistory', function (chathistory) {
+            //showGreeting(JSON.parse(chathistory.body).msg);
+        	console.log(chathistory.body);
         });
     });
 }

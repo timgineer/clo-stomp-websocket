@@ -1,6 +1,7 @@
 package us.neuner.clo.server;
 
 import us.neuner.clo.message.ChatMessage;
+import us.neuner.clo.message.Message;
 import us.neuner.clo.message.ChatEntry;
 
 import java.util.Set;
@@ -21,14 +22,49 @@ public class CloGameServer {
 
     private Log log = LogFactory.getLog(CloGameServer.class);
 
-    private Set<String> sidSet = Collections.synchronizedSet(new TreeSet<String>());
+    private CloGameSession session = new CloGameSession(this);
 
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
-   
+    
+    public CloGameServer() {
+    	
+    	session = new CloGameSession(this);
+    }
+    
+    @MessageMapping("/message")
+    public void messageResourceHandler(ChatMessage chat, SimpMessageHeaderAccessor sha) {
+    	
+    	PlayerDetail pd = PlayerDetail.getPlayerDetail(chat.getPsid()); 
+
+        if (pd == null) {
+        	pd = new PlayerDetail(session, sha.getSessionId());
+        	session.clientJoinHandler(pd);
+        }
+        
+        pd.getSession().chatMessageHandler(chat);
+        
+    	// reverse compatibility
+        chatMessageHandler(chat, sha);
+        
+    }
+
+    //TODO: Create test for this class with a {PlayerDetail, ChatHistoryMessage} signature.
+    public void sendToClient(PlayerDetail pd, Message msg) {
+    	
+        SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create();
+        accessor.setSessionId(pd.getSid());
+        accessor.setLeaveMutable(true);
+
+        // /queue/chathistory - broadcasts individual messages as they arrive
+        messagingTemplate.convertAndSendToUser(pd.getSid(), "/queue/chathistory", msg, accessor.getMessageHeaders());
+    }
+    
+    ////////////// START REVERSE COMPATIBILITY ////////////// 
+    private Set<String> sidSet = Collections.synchronizedSet(new TreeSet<String>());
+    
     //client sends messages to "/client/message"
     //client subscribes to /user/topic/chat 
-    @MessageMapping("/message")
     public void chatMessageHandler(ChatMessage chat, SimpMessageHeaderAccessor sha) {
 
         ChatEntry payload = new ChatEntry(chat.getMsg());
@@ -52,4 +88,5 @@ public class CloGameServer {
             }
         }
     }
+    //////////////  END REVERSE COMPATIBILITY  //////////////
 }

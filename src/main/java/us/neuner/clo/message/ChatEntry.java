@@ -5,6 +5,7 @@ public class ChatEntry {
     private String msg;
 
     public ChatEntry() {
+    	this.msg = "";
     }
 
     public ChatEntry(String msg) {

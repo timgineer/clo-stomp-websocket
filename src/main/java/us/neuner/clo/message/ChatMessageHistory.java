@@ -2,16 +2,18 @@ package us.neuner.clo.message;
 
 import java.util.*;
 
-public class ChatMessageHistory {
+public class ChatMessageHistory extends Message {
 
     private List<ChatEntry> msgList;
 
-    public ChatMessageHistory() {
-        this.msgList = Collections.synchronizedList(new LinkedList<ChatEntry>());
+    public ChatMessageHistory(String psid) {
+    	super(psid);
+        this.msgList = new LinkedList<ChatEntry>();
     }
 
-    public ChatMessageHistory(Collection<ChatEntry> msgList) {
-        this.msgList = Collections.synchronizedList(new LinkedList<ChatEntry>(msgList));
+    public ChatMessageHistory(String psid, Collection<ChatEntry> msgList) {
+    	super(psid);
+        this.msgList = new LinkedList<ChatEntry>(msgList);
     }
 
     public ChatEntry getMsg(int index) {
