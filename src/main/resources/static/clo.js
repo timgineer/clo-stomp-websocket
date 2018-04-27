@@ -1,4 +1,5 @@
 var stompClient = null;
+var psid = null;
 
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
@@ -18,12 +19,17 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/user/queue/chat', function (chat) {
-            showGreeting(JSON.parse(chat.body).msg);
-        });
+        //stompClient.subscribe('/user/queue/chat', function (chat) {
+        //    showChat(JSON.parse(chat.body).msg);
+        //});
         stompClient.subscribe('/user/queue/chathistory', function (chathistory) {
-            //showGreeting(JSON.parse(chathistory.body).msg);
+        	
         	console.log(chathistory.body);
+        	
+        	var msg = JSON.parse(chathistory.body);
+        	if ((typeof msg == "object") && (typeof msg.psid == "string"))
+        		psid = msg.psid;
+        	showChatHistory(msg);
         });
     });
 }
@@ -36,13 +42,28 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/client/message", {}, JSON.stringify({'msg': $("#msg").val()}));
+function sendChat() {
+	var message = {'msg': $("#msg").val()};
+	if (psid != null)
+		message.psid = psid;
+    stompClient.send("/client/message", {}, JSON.stringify(message));
 }
 
-function showGreeting(message) {
-    $("#messages").html("");
-    $("#messages").append("<tr><td>" + message + "</td></tr>");
+//function showChat(message) {
+//    $("#messages").append("<tr><td>" + message + "</td></tr>");
+//}
+
+function showChatHistory(ch) {
+	var messages = $("#messages"); 
+	if ((ch != null) && (typeof ch.msgList == "object")) {
+	    messages.html("");
+	    for (var i = 0; i < ch.msgList.length; i++) {
+	    	var msg = ch.msgList[i].msg;
+	    	if (typeof msg == "string")
+	    		messages.append("<tr><td>" + msg + "</td></tr>");
+	    }
+	    messages[0].lastChild.scrollIntoViewIfNeeded();
+	}
 }
 
 $(function () {
@@ -51,5 +72,5 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
+    $( "#send" ).click(function() { sendChat(); });
 });
