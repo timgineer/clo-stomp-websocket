@@ -62,7 +62,7 @@ function showChatHistory(ch) {
 	    	if (typeof msg == "string")
 	    		messages.append("<tr><td>" + msg + "</td></tr>");
 	    }
-	    messages[0].lastChild.scrollIntoViewIfNeeded();
+	    messages[0].lastChild.scrollIntoView();
 	}
 }
 

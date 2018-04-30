@@ -31,8 +31,11 @@ public class CloGameSession {
 		msgList.add(new ChatEntry(chat.getMsg()));
                 
         for (PlayerDetail pd : players) {
-        	ChatMessageHistory h = new ChatMessageHistory(pd.getPsid(), msgList); 
-        	server.sendToClient(pd, h);
+        	String psid = pd.getPsid();
+        	if (psid != null) {
+	        	ChatMessageHistory h = new ChatMessageHistory(psid, msgList); 
+	        	server.sendToClient(pd, h);
+        	}
         }
 	}
 }

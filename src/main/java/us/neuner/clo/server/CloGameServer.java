@@ -9,11 +9,12 @@ import java.util.TreeSet;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,18 +36,22 @@ public class CloGameServer {
     @MessageMapping("/message")
     public void messageResourceHandler(ChatMessage chat, SimpMessageHeaderAccessor sha) {
     	
-    	PlayerDetail pd = PlayerDetail.getPlayerDetail(chat.getPsid()); 
+    	PlayerDetail pd = PlayerDetail.getPlayerDetail(chat.getPsid());
+    	String sid = sha.getSessionId();
 
+    	assert(sid != null && !sid.isEmpty());
+    	
         if (pd == null) {
-        	pd = new PlayerDetail(session, sha.getSessionId());
+        	pd = new PlayerDetail(session, sid);
         	session.clientJoinHandler(pd);
+        } else if (!sid.equals(pd.getSid())) {
+        	pd.setSid(sid);
         }
         
         pd.getSession().chatMessageHandler(chat);
         
     	// reverse compatibility
         chatMessageHandler(chat, sha);
-        
     }
 
     //TODO: Create test for this class with a {PlayerDetail, ChatHistoryMessage} signature.
@@ -58,6 +63,13 @@ public class CloGameServer {
 
         // /queue/chathistory - broadcasts individual messages as they arrive
         messagingTemplate.convertAndSendToUser(pd.getSid(), "/queue/chathistory", msg, accessor.getMessageHeaders());
+    }
+
+    @EventListener
+    public void onDisconnectEvent(SessionDisconnectEvent e) {
+    	String sid = e.getSessionId();
+    	log.info("Client disconnect: " + sid);
+    	
     }
     
     ////////////// START REVERSE COMPATIBILITY ////////////// 
@@ -76,16 +88,17 @@ public class CloGameServer {
             accessor.setLeaveMutable(true);
 
             // /queue/chat - broadcasts individual messages as they arrive
-            try { 
-            	ChatMessage msg = new ChatMessage("asdf", chat.getMsg());
-                messagingTemplate.convertAndSendToUser(sid, "/queue/chat", msg, accessor.getMessageHeaders()); 
-            }
-            catch (Exception e) {
-                //TODO: this doesn't get triggered... why not?  Probably a memory leak somewhere...
-                log.info("Connection closed: " + sid, e);
-                sidSet.remove(sid);
-            }
+        	ChatMessage msg = new ChatMessage("asdf", chat.getMsg());
+            messagingTemplate.convertAndSendToUser(sid, "/queue/chat", msg, accessor.getMessageHeaders());
         }
+    }
+
+    @EventListener
+    public void onDisconnectEventDeleteMe(SessionDisconnectEvent e) {
+    	String sid = e.getSessionId();
+    	//log.info("Client disconnect: " + sid);
+        sidSet.remove(sid);
+    	
     }
     //////////////  END REVERSE COMPATIBILITY  //////////////
 }

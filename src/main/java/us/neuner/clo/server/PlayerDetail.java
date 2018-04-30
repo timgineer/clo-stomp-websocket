@@ -35,6 +35,7 @@ public class PlayerDetail implements AutoCloseable {
 	
 	private final CloGameSession session;
 	private final String psid;
+
 	private String sid;
 	
 	/**
@@ -73,11 +74,19 @@ public class PlayerDetail implements AutoCloseable {
 	}
 
 	/**
-	 * Get the most recently session ID, which maps to specific WebSocket connections.
+	 * Get the most recently session ID, which maps to a specific WebSocket connection.
 	 * @return a session ID String
 	 */
 	public String getSid() {
 		return sid;
+	}
+
+	/**
+	 * Set the most recently session ID, which maps to a specific WebSocket connection.
+	 * @param sid a session ID String
+	 */
+	public void setSid(String sid) {
+		this.sid = sid;
 	}
 
 	/**
