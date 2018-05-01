@@ -5,6 +5,8 @@ var psid = null;
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
     $("#disconnect").prop("disabled", !connected);
+    $("#nameInput").prop("disabled", connected);
+    $("#msgInput").prop("disabled", !connected);
     if (connected) {
         $("#conversation").show();
     }
@@ -29,7 +31,7 @@ function connect() {
         	showChatHistory(msg);
         });
         
-        sendClientJoin("changeThisName");
+        sendClientJoin($("#nameInput").val());
     });
 }
 
@@ -59,7 +61,7 @@ function sendClientJoin(playerName, sessionPassword = null) {
 
 function sendChat() {
 	var message = makeMessage("chat");
-	message.msg = $("#msg").val();
+	message.msg = $("#msgInput").val();
     stompClient.send("/client/message", {}, JSON.stringify(message));
 }
 
@@ -72,9 +74,10 @@ function showChatHistory(ch) {
 	if ((ch != null) && (typeof ch.msgList == "object")) {
 	    messages.html("");
 	    for (var i = 0; i < ch.msgList.length; i++) {
+	    	var from = ch.msgList[i].playerName;
 	    	var msg = ch.msgList[i].msg;
-	    	if (typeof msg == "string")
-	    		messages.append("<tr><td>" + msg + "</td></tr>");
+	    	if ((typeof from == "string") && (typeof msg == "string"))
+	    		messages.append("<tr><td>[" + from + "] "+ msg + "</td></tr>");
 	    }
 	    if (messages[0].childElementCount > 0)
 	    	messages[0].lastChild.scrollIntoView();

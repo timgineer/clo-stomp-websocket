@@ -1,8 +1,11 @@
 package us.neuner.clo.server;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import us.neuner.clo.message.ChatEntry;
 import us.neuner.clo.message.ChatMessage;
@@ -31,6 +34,9 @@ public class CloGameSession {
 			pd = new PlayerDetail(this, sid, join.getPlayerName());
 			players.add(pd);
 		}
+		else {
+			pd.getPlayerInfo().setPlayerName(join.getPlayerName());
+		}
 		
 		//TODO: sendGameSetup
 		sendChatHistory(pd);
@@ -38,11 +44,21 @@ public class CloGameSession {
 		return true;
 	}
 	
-	public void chatMessageHandler(ChatMessage chat) {
+	/**
+	 * Handles chat messages from clients.
+	 * @param chat the @see ChatMessage that the server received
+	 * @param playerName player name for the client that sent the message
+	 */
+	public void chatMessageHandler(ChatMessage chat, String playerName) {
 		String msg = chat.getMsg();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/mm/dd HH:mm:ss");
+		Date date = new Date();
+		
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 
 		if ((msg != null) && !msg.isEmpty())
-			msgList.add(new ChatEntry(msg));
+			msgList.add(new ChatEntry(playerName, msg, sdf.format(date)));
                 
         for (PlayerDetail pd : players)
         	sendChatHistory(pd);

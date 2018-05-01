@@ -56,7 +56,7 @@ public class CloGameServer {
         else {
         	//Handling for stateful messages
         	if (msg instanceof us.neuner.clo.message.ChatMessage) {
-	        	pd.getSession().chatMessageHandler((us.neuner.clo.message.ChatMessage)msg);
+	        	pd.getSession().chatMessageHandler((us.neuner.clo.message.ChatMessage)msg, pd.getPlayerInfo().getPlayerName());
 	        }
         }
         
