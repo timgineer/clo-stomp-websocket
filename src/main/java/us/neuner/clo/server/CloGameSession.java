@@ -11,6 +11,7 @@ import us.neuner.clo.message.ChatEntry;
 import us.neuner.clo.message.ChatMessage;
 import us.neuner.clo.message.ChatMessageHistory;
 import us.neuner.clo.message.ClientJoinMessage;
+import us.neuner.clo.message.GameSetupMessage;
 
 public class CloGameSession {
     
@@ -38,7 +39,7 @@ public class CloGameSession {
 			pd.getPlayerInfo().setPlayerName(join.getPlayerName());
 		}
 		
-		//TODO: sendGameSetup
+		sendGameSetup();
 		sendChatHistory(pd);
 		
 		return true;
@@ -60,8 +61,21 @@ public class CloGameSession {
 		if ((msg != null) && !msg.isEmpty())
 			msgList.add(new ChatEntry(playerName, msg, sdf.format(date)));
                 
-        for (PlayerDetail pd : players)
+        for (PlayerDetail pd : this.players)
         	sendChatHistory(pd);
+	}
+	
+	private void sendGameSetup() {
+	    List<PlayerInfo> pInfoList = new ArrayList<PlayerInfo>(players.size());
+
+        for (PlayerDetail pd : this.players)
+        	pInfoList.add(pd.getPlayerInfo());
+        
+        for (PlayerDetail pd : this.players) {
+        	String psid = pd.getPsid();
+        	GameSetupMessage gsm = new GameSetupMessage(psid, pInfoList);
+        	server.sendToClient(pd, gsm);
+        }
 	}
 	
 	/**

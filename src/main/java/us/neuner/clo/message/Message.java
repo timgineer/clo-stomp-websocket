@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
 @JsonSubTypes({ 
 	@Type(value = ClientJoinMessage.class, name = "clientJoin"), 
+	@Type(value = GameSetupMessage.class, name = "gameSetup"), 
 	@Type(value = ChatMessage.class, name = "chat"), 
 	@Type(value = ChatMessageHistory.class, name = "chatHistory"),
 })

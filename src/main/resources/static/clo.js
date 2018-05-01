@@ -1,5 +1,4 @@
 var stompClient = null;
-var chatHistorySubscription = null
 var psid = null;
 
 function setConnected(connected) {
@@ -23,12 +22,13 @@ function connect() {
         setConnected(true);
         console.log('Connected: ' + frame);
         
-        chatHistorySubscription = stompClient.subscribe('/user/queue/chathistory', function (chathistory) {
+        stompClient.subscribe('/user/queue/server', function (serverMessage) {
         	
-        	var msg = JSON.parse(chathistory.body);
+        	var msg = JSON.parse(serverMessage.body);
         	if ((typeof msg == "object") && (typeof msg.psid == "string"))
         		psid = msg.psid;
-        	showChatHistory(msg);
+        	if ((typeof msg.type == "string") && (msg.type == "chatHistory"))
+        		showChatHistory(msg);
         });
         
         sendClientJoin($("#nameInput").val());

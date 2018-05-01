@@ -72,8 +72,8 @@ public class CloGameServer {
         accessor.setSessionId(pd.getSid());
         accessor.setLeaveMutable(true);
 
-        // /queue/chathistory - broadcasts individual messages as they arrive
-        messagingTemplate.convertAndSendToUser(pd.getSid(), "/queue/chathistory", msg, accessor.getMessageHeaders());
+        // /queue/server - sends individual messages from server to clients
+        messagingTemplate.convertAndSendToUser(pd.getSid(), "/queue/server", msg, accessor.getMessageHeaders());
     }
 
     @EventListener
