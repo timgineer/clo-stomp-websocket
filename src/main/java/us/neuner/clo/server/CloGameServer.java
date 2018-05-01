@@ -1,8 +1,6 @@
 package us.neuner.clo.server;
 
-import us.neuner.clo.message.ChatMessage;
 import us.neuner.clo.message.Message;
-import us.neuner.clo.message.ChatEntry;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -34,9 +32,9 @@ public class CloGameServer {
     }
     
     @MessageMapping("/message")
-    public void messageResourceHandler(ChatMessage chat, SimpMessageHeaderAccessor sha) {
+    public void messageResourceHandler(us.neuner.clo.message.Message msg, SimpMessageHeaderAccessor sha) {
     	
-    	PlayerDetail pd = PlayerDetail.getPlayerDetail(chat.getPsid());
+    	PlayerDetail pd = PlayerDetail.getPlayerDetail(msg.getPsid());
     	String sid = sha.getSessionId();
 
     	assert(sid != null && !sid.isEmpty());
@@ -48,10 +46,12 @@ public class CloGameServer {
         	pd.setSid(sid);
         }
         
-        pd.getSession().chatMessageHandler(chat);
+        if (msg instanceof us.neuner.clo.message.ChatMessage)
+        	pd.getSession().chatMessageHandler((us.neuner.clo.message.ChatMessage)msg);
         
     	// reverse compatibility
-        chatMessageHandler(chat, sha);
+        if (msg instanceof us.neuner.clo.message.ChatMessage)
+        	chatMessageHandler((us.neuner.clo.message.ChatMessage)msg, sha);
     }
 
     //TODO: Create test for this class with a {PlayerDetail, ChatHistoryMessage} signature.
@@ -77,7 +77,7 @@ public class CloGameServer {
     
     //client sends messages to "/client/message"
     //client subscribes to /user/topic/chat 
-    public void chatMessageHandler(ChatMessage chat, SimpMessageHeaderAccessor sha) {
+    public void chatMessageHandler(us.neuner.clo.message.ChatMessage chat, SimpMessageHeaderAccessor sha) {
 
         sidSet.add(sha.getSessionId());
 
@@ -88,7 +88,7 @@ public class CloGameServer {
             accessor.setLeaveMutable(true);
 
             // /queue/chat - broadcasts individual messages as they arrive
-        	ChatMessage msg = new ChatMessage("asdf", chat.getMsg());
+            us.neuner.clo.message.ChatMessage msg = new us.neuner.clo.message.ChatMessage("asdf", chat.getMsg());
             messagingTemplate.convertAndSendToUser(sid, "/queue/chat", msg, accessor.getMessageHeaders());
         }
     }

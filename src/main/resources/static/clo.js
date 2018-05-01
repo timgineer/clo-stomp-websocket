@@ -1,4 +1,5 @@
 var stompClient = null;
+var chatHistorySubscription = null
 var psid = null;
 
 function setConnected(connected) {
@@ -19,18 +20,16 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        //stompClient.subscribe('/user/queue/chat', function (chat) {
-        //    showChat(JSON.parse(chat.body).msg);
-        //});
-        stompClient.subscribe('/user/queue/chathistory', function (chathistory) {
-        	
-        	console.log(chathistory.body);
+        
+        chatHistorySubscription = stompClient.subscribe('/user/queue/chathistory', function (chathistory) {
         	
         	var msg = JSON.parse(chathistory.body);
         	if ((typeof msg == "object") && (typeof msg.psid == "string"))
         		psid = msg.psid;
         	showChatHistory(msg);
         });
+        
+        sendClientJoin("changeThisName");
     });
 }
 
@@ -42,10 +41,25 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendChat() {
-	var message = {'msg': $("#msg").val()};
-	if (psid != null)
+function makeMessage(type) {
+	var message = {};
+	message.type = type;
+	if (typeof psid == "string")
 		message.psid = psid;
+	return message;
+}
+
+function sendClientJoin(playerName, sessionPassword = null) {
+	var message = makeMessage("clientJoin");
+	if (typeof sessionPassword == "string")
+		message.sessionPassword = sessionPassword;
+	message.playerName = playerName
+	stompClient.send("/client/message", {}, JSON.stringify(message));
+}
+
+function sendChat() {
+	var message = makeMessage("chat");
+	message.msg = $("#msg").val();
     stompClient.send("/client/message", {}, JSON.stringify(message));
 }
 
@@ -62,7 +76,8 @@ function showChatHistory(ch) {
 	    	if (typeof msg == "string")
 	    		messages.append("<tr><td>" + msg + "</td></tr>");
 	    }
-	    messages[0].lastChild.scrollIntoView();
+	    if (messages[0].childElementCount > 0)
+	    	messages[0].lastChild.scrollIntoView();
 	}
 }
 
