@@ -7,6 +7,7 @@ import java.util.List;
 import us.neuner.clo.message.ChatEntry;
 import us.neuner.clo.message.ChatMessage;
 import us.neuner.clo.message.ChatMessageHistory;
+import us.neuner.clo.message.ClientJoinMessage;
 
 public class CloGameSession {
     
@@ -21,21 +22,42 @@ public class CloGameSession {
 	}
 	
 	// TODO: Refactor this to the ClientJoinMessage...
-	public void clientJoinHandler(PlayerDetail chat) {
+	public Boolean clientJoinHandler(ClientJoinMessage join, String sid, PlayerDetail pd) {
+
+		//TODO: handling for session that has reached max player count
 		
-		players.add(chat);
+		if (pd == null) {
+			//TODO: handling for playerName collision
+			pd = new PlayerDetail(this, sid, join.getPlayerName());
+			players.add(pd);
+		}
+		
+		//TODO: sendGameSetup
+		sendChatHistory(pd);
+		
+		return true;
 	}
 	
 	public void chatMessageHandler(ChatMessage chat) {
+		String msg = chat.getMsg();
 
-		msgList.add(new ChatEntry(chat.getMsg()));
+		if ((msg != null) && !msg.isEmpty())
+			msgList.add(new ChatEntry(msg));
                 
-        for (PlayerDetail pd : players) {
-        	String psid = pd.getPsid();
-        	if (psid != null) {
-	        	ChatMessageHistory h = new ChatMessageHistory(psid, msgList); 
-	        	server.sendToClient(pd, h);
-        	}
-        }
+        for (PlayerDetail pd : players)
+        	sendChatHistory(pd);
+	}
+	
+	/**
+	 * Sends the session chat history to the specified player.
+	 * @param pd the player which will receive a @see ChatMessageHistory
+	 */
+	private void sendChatHistory(PlayerDetail pd) {
+		
+    	String psid = pd.getPsid();
+    	if (psid != null) {
+        	ChatMessageHistory h = new ChatMessageHistory(psid, msgList); 
+        	server.sendToClient(pd, h);
+    	}
 	}
 }

@@ -38,16 +38,27 @@ public class CloGameServer {
     	String sid = sha.getSessionId();
 
     	assert(sid != null && !sid.isEmpty());
-    	
-        if (pd == null) {
-        	pd = new PlayerDetail(session, sid);
-        	session.clientJoinHandler(pd);
-        } else if (!sid.equals(pd.getSid())) {
+
+    	if ((pd != null) && !sid.equals(pd.getSid())) {
         	pd.setSid(sid);
         }
-        
-        if (msg instanceof us.neuner.clo.message.ChatMessage)
-        	pd.getSession().chatMessageHandler((us.neuner.clo.message.ChatMessage)msg);
+    	
+        if (msg instanceof us.neuner.clo.message.ClientJoinMessage) {
+        	//Handling for newly-connected clients
+        	Boolean joined = session.clientJoinHandler((us.neuner.clo.message.ClientJoinMessage)msg, sid, pd);
+        	if (!joined) {
+        		//TODO: Handling for failed client join operations
+        	}
+        }
+        else if (pd == null) {
+        	//TODO: Handling for stateful client messages from unknown endpoints
+        }
+        else {
+        	//Handling for stateful messages
+        	if (msg instanceof us.neuner.clo.message.ChatMessage) {
+	        	pd.getSession().chatMessageHandler((us.neuner.clo.message.ChatMessage)msg);
+	        }
+        }
         
     	// reverse compatibility
         if (msg instanceof us.neuner.clo.message.ChatMessage)

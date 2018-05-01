@@ -35,6 +35,7 @@ public class PlayerDetail implements AutoCloseable {
 	
 	private final CloGameSession session;
 	private final String psid;
+	private final PlayerInfo playerInfo;
 
 	private String sid;
 	
@@ -42,7 +43,7 @@ public class PlayerDetail implements AutoCloseable {
 	 * Creates a new PlayerDetail object.
 	 * @param sid the initial session ID for this PlayerDetail object.
 	 */
-	public PlayerDetail(CloGameSession session, String sid) {
+	public PlayerDetail(CloGameSession session, String sid, String playerName) {
 		
 		SecureRandom rng = new SecureRandom();
 		byte[] b = new byte[15];
@@ -51,6 +52,7 @@ public class PlayerDetail implements AutoCloseable {
 		this.session = session;
 		this.sid = sid;
 		this.psid = DatatypeConverter.printBase64Binary(b);
+		this.playerInfo = new PlayerInfo(playerName);
 		
 		players.put(psid, this);
 	}
@@ -95,5 +97,13 @@ public class PlayerDetail implements AutoCloseable {
 	 */
 	public String getPsid() {
 		return psid;
+	}
+	
+	/**
+	 * Get the @see PlayerInfo object for this instance.
+	 * @return a @PlayerInfo object
+	 */
+	public PlayerInfo getPlayerInfo() {
+		return playerInfo;
 	}
 }
