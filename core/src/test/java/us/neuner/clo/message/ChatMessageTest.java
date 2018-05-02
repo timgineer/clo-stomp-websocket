@@ -26,10 +26,9 @@ public class ChatMessageTest {
 
 	@Test
 	public void testChatMessageDeserialization() throws IOException {
-		String type = "chat";
 		String psid = "ja84fgjk29f";
 		String msg = "TEST MESSAGE";
-		String json = "{\"type\":\"" + type + "\",\"psid\":\"" + psid + "\",\"msg\":\"" + msg + "\"}";
+		String json = "{\"type\":\"chat\",\"psid\":\"" + psid + "\",\"msg\":\"" + msg + "\"}";
 
 		ChatMessage cm = new ObjectMapper().readerFor(ChatMessage.class).readValue(json);
 		assertEquals(psid, cm.getPsid());
