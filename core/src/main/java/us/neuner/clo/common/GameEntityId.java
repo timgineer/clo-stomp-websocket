@@ -1,5 +1,7 @@
 package us.neuner.clo.common;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum GameEntityId {
 	InvalidValue("Invalid Value"),
 	MissScarlet("Miss Scarlet")
@@ -12,6 +14,7 @@ public enum GameEntityId {
 		this.text = text;
 	}
 	
+	@JsonValue
 	@Override
 	public String toString() {
 		return text;
