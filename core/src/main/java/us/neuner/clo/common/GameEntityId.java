@@ -1,4 +1,4 @@
-package us.neuner.clo.server;
+package us.neuner.clo.common;
 
 public enum GameEntityId {
 	InvalidValue("Invalid Value"),
