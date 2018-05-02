@@ -1,5 +1,7 @@
 package us.neuner.clo.server;
 
+import us.neuner.clo.common.PlayerInfo;
+
 import java.lang.AutoCloseable;
 import java.security.SecureRandom;
 import java.util.SortedMap;

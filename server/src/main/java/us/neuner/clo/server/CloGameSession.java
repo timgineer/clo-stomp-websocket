@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import us.neuner.clo.common.PlayerInfo;
 import us.neuner.clo.message.ChatEntry;
 import us.neuner.clo.message.ChatMessage;
 import us.neuner.clo.message.ChatMessageHistory;
