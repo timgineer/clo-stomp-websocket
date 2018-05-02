@@ -10,11 +10,10 @@ import us.neuner.clo.common.PlayerInfo;
 
 public class GameSetupMessage extends Message {
 
-	@JsonProperty
     private List<PlayerInfo> players; 
 	
     @JsonCreator
-	public GameSetupMessage(String psid, List<PlayerInfo> players) {
+	public GameSetupMessage(@JsonProperty("psid") String psid, @JsonProperty("players") List<PlayerInfo> players) {
 		super(psid);
 		this.players = new ArrayList<PlayerInfo>(players);
 	}

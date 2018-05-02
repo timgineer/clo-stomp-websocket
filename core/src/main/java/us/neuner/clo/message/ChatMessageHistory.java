@@ -18,7 +18,7 @@ public class ChatMessageHistory extends Message {
     }
 
     @JsonCreator
-    public ChatMessageHistory(String psid, List<ChatEntry> msgList) {
+    public ChatMessageHistory(@JsonProperty("psid") String psid, @JsonProperty("msgList") List<ChatEntry> msgList) {
     	super(psid);
         this.msgList = new ArrayList<ChatEntry>(msgList);
     }

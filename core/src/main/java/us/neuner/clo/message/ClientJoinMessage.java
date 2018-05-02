@@ -1,6 +1,7 @@
 package us.neuner.clo.message;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ClientJoinMessage extends Message {
 
@@ -8,7 +9,7 @@ public class ClientJoinMessage extends Message {
 	private String playerName;
 
     @JsonCreator
-	public ClientJoinMessage(String psid, String sessionPassword, String playerName) {
+	public ClientJoinMessage(@JsonProperty("psid") String psid, @JsonProperty("sessionPassword") String sessionPassword, @JsonProperty("playerName") String playerName) {
 		super(psid);
 		this.setSessionPassword(sessionPassword);
 		this.setPlayerName(playerName);
