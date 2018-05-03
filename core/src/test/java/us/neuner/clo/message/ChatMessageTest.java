@@ -20,6 +20,7 @@ public class ChatMessageTest {
 		ChatMessage cm = new ChatMessage(psid, msg);
 		
 		String json = new ObjectMapper().writeValueAsString(cm);
+		assertThat(json, containsString("chat"));
 		assertThat(json, containsString(psid));
 		assertThat(json, containsString(msg));
 	}
