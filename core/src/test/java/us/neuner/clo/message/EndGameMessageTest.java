@@ -40,6 +40,7 @@ public class EndGameMessageTest {
 		String json = String.format(jsonFormat, psid, victor, GameEntityId.InvalidValue, GameEntityId.MissScarlet, GameEntityId.InvalidValue);
 		
 		json = json.replace("''", "\"");
+		// json = {"type":"endGame","psid":"ja84fgjk31f","victor":"Roger Rabbit","solution":{"location":""Invalid Value","suspect":"Miss Scarlet","weapon":"Invalid Value"}}";
 
 		EndGameMessage eg = new ObjectMapper().readerFor(EndGameMessage.class).readValue(json);
 		assertEquals(psid, eg.getPsid());
